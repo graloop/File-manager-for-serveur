@@ -1,0 +1,11 @@
+{
+  "name": "ssh-file-manager-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for SSH File Manager",
+  "scripts": {
+    "start": "npx serve public"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

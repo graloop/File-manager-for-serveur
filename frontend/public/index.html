@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Explorer - Server</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Top Connection Bar / Ribbon Header -->
+        <header id="win-header">
+            <div id="connection-panel">
+                <form id="ssh-form">
+                    <input type="text" id="host" placeholder="Server IP / Host" required value="192.168.0.">
+                    <input type="text" id="username" placeholder="Username" required value="root">
+                    <input type="password" id="password" placeholder="Password">
+                    <button type="submit">Connect Server</button>
+                </form>
+                <div id="connection-status">Disconnected</div>
+            </div>
+        </header>
+
+        <!-- Windows Explorer Ribbon / Toolbar -->
+        <div id="win-ribbon">
+            <div class="ribbon-group">
+                <button id="back-btn" disabled title="Back">⬅️</button>
+                <button id="forward-btn" disabled title="Forward">➡️</button>
+                <button id="up-btn" disabled title="Up">⬆️</button>
+            </div>
+            <div class="ribbon-group breadcrumb-container">
+                <div id="breadcrumb-bar">
+                    <span class="breadcrumb-item">📁 This PC</span>
+                </div>
+            </div>
+            <div class="ribbon-group action-buttons">
+                <button id="new-folder-btn" disabled title="New Folder">📁 New Folder</button>
+                <button id="refresh-btn" disabled title="Refresh">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <main id="win-main">
+            <!-- Sidebar Navigation Pane -->
+            <nav id="win-sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Quick Access</div>
+                    <ul class="sidebar-list">
+                        <li class="sidebar-item" data-path="/">🗂️ Root /</li>
+                        <li class="sidebar-item" data-path="/root">🏠 Home (/root)</li>
+                        <li class="sidebar-item" data-path="/var/www">🌐 Web Server (/var/www)</li>
+                        <li class="sidebar-item" data-path="/etc">⚙️ Configurations (/etc)</li>
+                        <li class="sidebar-item" data-path="/tmp">🗑️ Temporary (/tmp)</li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Files View (Details Table View) -->
+            <section id="win-content">
+                <div id="file-table-container">
+                    <table id="file-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Name</th>
+                                <th style="width: 20%;">Date modified</th>
+                                <th style="width: 15%;">Type</th>
+                                <th style="width: 25%;">Size</th>
+                            </tr>
+                        </thead>
+                        <tbody id="file-list-tbody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #666; padding: 2rem;">
+                                    Connect to a server using SSH to browse files.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Context Menu -->
+                <ul id="context-menu">
+                    <li id="menu-open">📂 Open</li>
+                    <li id="menu-rename">✏️ Rename</li>
+                    <hr style="margin: 2px 0; border: none; border-top: 1px solid #ddd;">
+                    <li id="menu-delete">🗑️ Delete</li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- Status Bar -->
+        <footer id="win-statusbar">
+            <span id="item-count-status">0 items</span>
+            <span id="selected-status"></span>
+        </footer>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

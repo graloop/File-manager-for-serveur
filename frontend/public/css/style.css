@@ -1,0 +1,274 @@
+/* Windows Explorer Theme Styles */
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f3f3;
+    color: #1e1e1e;
+    user-select: none;
+    font-size: 13px;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Connection Header */
+#win-header {
+    background-color: #2b2b2b;
+    color: white;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #1f1f1f;
+}
+
+#ssh-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#ssh-form input {
+    background-color: #3c3c3c;
+    border: 1px solid #555;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 2px;
+    font-size: 12px;
+}
+
+#ssh-form input::placeholder {
+    color: #aaa;
+}
+
+#ssh-form button {
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#ssh-form button:hover {
+    background-color: #106ebe;
+}
+
+#connection-status {
+    margin-left: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Ribbon / Toolbar */
+#win-ribbon {
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ribbon-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ribbon-group button {
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.ribbon-group button:hover:not(:disabled) {
+    background-color: #e5f3ff;
+    border-color: #cce8ff;
+}
+
+.ribbon-group button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.breadcrumb-container {
+    flex: 1;
+    background: white;
+    border: 1px solid #d0d0d0;
+    border-radius: 2px;
+    padding: 3px 8px;
+    display: flex;
+    align-items: center;
+}
+
+#breadcrumb-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.breadcrumb-crumb {
+    cursor: pointer;
+    color: #005a9e;
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+.breadcrumb-crumb:hover {
+    background-color: #e5f3ff;
+    text-decoration: underline;
+}
+
+/* Main Layout */
+#win-main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    background-color: white;
+}
+
+/* Sidebar Navigation */
+#win-sidebar {
+    width: 220px;
+    background-color: #fbfbfb;
+    border-right: 1px solid #d0d0d0;
+    padding: 8px 0;
+    overflow-y: auto;
+}
+
+.sidebar-section {
+    margin-bottom: 15px;
+}
+
+.sidebar-title {
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #616161;
+    text-transform: uppercase;
+}
+
+.sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0 0;
+}
+
+.sidebar-item {
+    padding: 6px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+}
+
+.sidebar-item:hover {
+    background-color: #f0f0f0;
+}
+
+.sidebar-item.active {
+    background-color: #cce8ff;
+    color: #000;
+}
+
+/* Files View (Details Table) */
+#win-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+#file-table-container {
+    flex: 1;
+    overflow-y: auto;
+    background-color: white;
+}
+
+#file-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+#file-table th {
+    background-color: #fafafa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 8px 12px;
+    font-weight: 600;
+    color: #333;
+    font-size: 12px;
+}
+
+#file-table td {
+    padding: 6px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-row {
+    cursor: default;
+}
+
+.file-row:hover {
+    background-color: #f2f6fc;
+}
+
+.file-row.selected {
+    background-color: #cce8ff !important;
+}
+
+/* Context Menu */
+#context-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #b0b0b0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    list-style: none;
+    padding: 4px 0;
+    margin: 0;
+    border-radius: 3px;
+    min-width: 140px;
+}
+
+#context-menu li {
+    padding: 6px 16px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#context-menu li:hover {
+    background-color: #0078d4;
+    color: white;
+}
+
+/* Status Bar */
+#win-statusbar {
+    background-color: #f0f0f0;
+    border-top: 1px solid #d0d0d0;
+    padding: 4px 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #555;
+}
