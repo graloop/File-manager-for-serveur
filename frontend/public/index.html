@@ -13,7 +13,7 @@
             <div id="connection-panel">
                 <form id="ssh-form">
                     <input type="text" id="host" placeholder="Server IP / Host" required value="192.168.0.">
-                    <input type="text" id="username" placeholder="Username" required value="root">
+                    <input type="text" id="username" placeholder="Username">
                     <input type="password" id="password" placeholder="Password">
                     <button type="submit">Connect Server</button>
                 </form>
@@ -60,10 +60,10 @@
                     <table id="file-table">
                         <thead>
                             <tr>
-                                <th style="width: 40%;">Name</th>
-                                <th style="width: 20%;">Date modified</th>
-                                <th style="width: 15%;">Type</th>
-                                <th style="width: 25%;">Size</th>
+                                <th style="width: 40%; cursor: pointer;" id="th-name" title="Click to sort by name">Name <span id="sort-name-indicator"></span></th>
+                                <th style="width: 20%; cursor: pointer;" id="th-date" title="Click to sort by date modified">Date modified <span id="sort-date-indicator"></span></th>
+                                <th style="width: 15%; cursor: pointer;" id="th-type" title="Click to sort by type">Type <span id="sort-type-indicator"></span></th>
+                                <th style="width: 25%; cursor: pointer;" id="th-size" title="Click to sort by size">Size <span id="sort-size-indicator"></span></th>
                             </tr>
                         </thead>
                         <tbody id="file-list-tbody">
@@ -92,7 +92,7 @@
             <span id="selected-status"></span>
         </footer>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

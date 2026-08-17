@@ -25,10 +25,19 @@ body {
     border-bottom: 1px solid #1f1f1f;
 }
 
+#connection-panel {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
 #ssh-form {
     display: flex;
     gap: 8px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 #ssh-form input {
@@ -214,6 +223,11 @@ body {
     font-weight: 600;
     color: #333;
     font-size: 12px;
+    user-select: none;
+}
+
+#file-table th:hover {
+    background-color: #f0f0f0;
 }
 
 #file-table td {

@@ -23,6 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let fileList = [];
     let selectedFile = null;
 
+    // Sorting state: { column: null | 'name' | 'date' | 'type' | 'size', direction: 0 | 1 | 2 }
+    // direction: 0 = normal (original order), 1 = first click, 2 = second click
+    let sortState = {
+        column: null,
+        direction: 0
+    };
+
     // Connect form submission
     form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -34,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.style.color = '#ffa500';
 
         socket.emit('ssh-connect', { host, port: 22, username, password });
+    });
+
+    socket.on('connect_error', (err) => {
+        statusDiv.textContent = 'Connection error';
+        statusDiv.style.color = '#ff6b6b';
+        console.error('Socket connection error:', err);
     });
 
     socket.on('ssh-status', (data) => {
@@ -74,8 +87,47 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFileList();
     });
 
+    socket.on('action-success', (msg) => {
+        console.log(msg);
+        navigateTo(currentPath);
+    });
+
+    socket.on('file-error', (err) => {
+        alert(err);
+    });
+
+    // Sorting headers & indicators
+    const thName = document.getElementById('th-name');
+    const thDate = document.getElementById('th-date');
+    const thType = document.getElementById('th-type');
+    const thSize = document.getElementById('th-size');
+    const sortNameIndicator = document.getElementById('sort-name-indicator');
+    const sortDateIndicator = document.getElementById('sort-date-indicator');
+    const sortTypeIndicator = document.getElementById('sort-type-indicator');
+    const sortSizeIndicator = document.getElementById('sort-size-indicator');
+
+    function handleHeaderSort(column) {
+        if (sortState.column === column) {
+            sortState.direction = (sortState.direction + 1) % 3;
+            if (sortState.direction === 0) {
+                sortState.column = null;
+            }
+        } else {
+            sortState.column = column;
+            sortState.direction = 1;
+        }
+        renderFileList();
+    }
+
+    thName.addEventListener('click', () => handleHeaderSort('name'));
+    thDate.addEventListener('click', () => handleHeaderSort('date'));
+    thType.addEventListener('click', () => handleHeaderSort('type'));
+    thSize.addEventListener('click', () => handleHeaderSort('size'));
+
     function navigateTo(path) {
-        socket.emit('list-dir', path);
+        if (socket) {
+            socket.emit('list-dir', path);
+        }
     }
 
     function updateNavButtons() {
@@ -145,17 +197,84 @@ document.addEventListener('DOMContentLoaded', () => {
         return date.toLocaleString();
     }
 
+    function getFileType(file) {
+        if (file.isDirectory) return 'File folder';
+        if (file.isSymbolicLink) return 'Symbolic Link';
+        const name = file.filename;
+        const lastDot = name.lastIndexOf('.');
+        if (lastDot > 0 && lastDot < name.length - 1) {
+            const ext = name.substring(lastDot + 1).toUpperCase();
+            return `${ext} File`;
+        }
+        return 'File';
+    }
+
     function renderFileList() {
         let html = '';
         let count = 0;
 
         // Filter out . and ..
-        const validList = fileList.filter(file => file.filename !== '.' && file.filename !== '..');
+        let validList = fileList.filter(file => file.filename !== '.' && file.filename !== '..');
+
+        // Apply sorting
+        if (sortState.column && sortState.direction > 0) {
+            validList.sort((a, b) => {
+                if (sortState.column === 'name') {
+                    const res = a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' });
+                    return sortState.direction === 1 ? res : -res;
+                } else if (sortState.column === 'date') {
+                    const timeA = a.mtime ? new Date(a.mtime).getTime() : 0;
+                    const timeB = b.mtime ? new Date(b.mtime).getTime() : 0;
+                    // First click: most recent to oldest (descending)
+                    // Second click: oldest to most recent (ascending)
+                    return sortState.direction === 1 ? (timeB - timeA) : (timeA - timeB);
+                } else if (sortState.column === 'type') {
+                    const typeA = getFileType(a);
+                    const typeB = getFileType(b);
+                    const res = typeA.localeCompare(typeB, undefined, { sensitivity: 'base' }) ||
+                                a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' });
+                    // First click: Ascending (A-Z)
+                    // Second click: Descending (Z-A)
+                    return sortState.direction === 1 ? res : -res;
+                } else if (sortState.column === 'size') {
+                    const sizeA = a.isDirectory ? -1 : (Number(a.size) || 0);
+                    const sizeB = b.isDirectory ? -1 : (Number(b.size) || 0);
+                    // First click: Largest to smallest (descending)
+                    // Second click: Smallest to largest (ascending)
+                    if (sortState.direction === 1) {
+                        return (sizeB !== sizeA) ? (sizeB - sizeA) : a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' });
+                    } else {
+                        return (sizeA !== sizeB) ? (sizeA - sizeB) : a.filename.localeCompare(b.filename, undefined, { numeric: true, sensitivity: 'base' });
+                    }
+                }
+                return 0;
+            });
+        }
+
+        // Update header indicators
+        sortNameIndicator.textContent = '';
+        sortDateIndicator.textContent = '';
+        sortTypeIndicator.textContent = '';
+        sortSizeIndicator.textContent = '';
+
+        if (sortState.column === 'name') {
+            if (sortState.direction === 1) sortNameIndicator.textContent = ' ▲';
+            else if (sortState.direction === 2) sortNameIndicator.textContent = ' ▼';
+        } else if (sortState.column === 'date') {
+            if (sortState.direction === 1) sortDateIndicator.textContent = ' ▼'; // most recent first
+            else if (sortState.direction === 2) sortDateIndicator.textContent = ' ▲'; // oldest first
+        } else if (sortState.column === 'type') {
+            if (sortState.direction === 1) sortTypeIndicator.textContent = ' ▲'; // A-Z
+            else if (sortState.direction === 2) sortTypeIndicator.textContent = ' ▼'; // Z-A
+        } else if (sortState.column === 'size') {
+            if (sortState.direction === 1) sortSizeIndicator.textContent = ' ▼'; // largest first
+            else if (sortState.direction === 2) sortSizeIndicator.textContent = ' ▲'; // smallest first
+        }
 
         validList.forEach((file, index) => {
             count++;
             const icon = file.isDirectory ? '📁' : (file.isSymbolicLink ? '🔗' : '📄');
-            const typeStr = file.isDirectory ? 'File folder' : 'File';
+            const typeStr = getFileType(file);
             const sizeStr = file.isDirectory ? '' : formatBytes(file.size);
             const dateStr = formatDate(file.mtime);
 
@@ -227,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const folderName = prompt('Enter name for the new folder:');
         if (folderName) {
             const newPath = currentPath === '/' ? `/${folderName}` : `${currentPath}/${folderName}`;
-            socket.emit('create-folder', newPath);
+            if (socket) socket.emit('create-folder', newPath);
         }
     });
 
@@ -247,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newName = prompt('Enter new name:', selectedFile.name);
             if (newName && newName !== selectedFile.name) {
                 const newPath = currentPath === '/' ? `/${newName}` : `${currentPath}/${newName}`;
-                socket.emit('rename-path', { oldPath, newPath });
+                if (socket) socket.emit('rename-path', { oldPath, newPath });
             }
         }
     });
@@ -257,17 +376,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedFile) {
             const filePath = currentPath === '/' ? `/${selectedFile.name}` : `${currentPath}/${selectedFile.name}`;
             if (confirm(`Are you sure you want to delete "${selectedFile.name}"?`)) {
-                socket.emit('delete-path', { filePath, isDir: selectedFile.isDir });
+                if (socket) socket.emit('delete-path', { filePath, isDir: selectedFile.isDir });
             }
         }
-    });
-
-    socket.on('action-success', (msg) => {
-        console.log(msg);
-        navigateTo(currentPath);
-    });
-
-    socket.on('file-error', (err) => {
-        alert(err);
     });
 });
